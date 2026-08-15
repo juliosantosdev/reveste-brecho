@@ -37,7 +37,7 @@ interface StoreValue {
   snackbar: Snackbar | null
   notify: (message: string, severity?: Snackbar["severity"]) => void
   clearSnackbar: () => void
-  reserveProduct: (id: string) => void
+  reserveProduct: (id: string, buyerName: string, buyerPhone: string) => void
   cancelReservation: (id: string) => void
   updateStatus: (id: string, status: OrderStatus) => void
   addProduct: (data: NewProductInput) => void
@@ -45,6 +45,8 @@ interface StoreValue {
   addReview: (author: string, rating: number, comment: string) => void
   addDesapego: (data: Omit<DesapegoRequest, "id" | "status">) => void
   resolveDesapego: (id: string, accepted: boolean) => void
+  reorderProducts: (activeId: string, overId: string) => void
+  updateProductDetails: (id: string, updates: Partial<Product>, imageFile?: File | null) => Promise<void>
 }
 
 export interface NewProductInput {
@@ -57,7 +59,6 @@ export interface NewProductInput {
   image: string
 }
 
-// --- MAPEAMENTOS AUXILIARES DE STATUS (BANCO <-> FRONT-END) ---
 const statusToDb = (status: OrderStatus): string => {
   switch (status) {
     case "Disponível":
@@ -88,61 +89,7 @@ const dbToStatus = (dbStatus: string): OrderStatus => {
   }
 }
 
-// --- DADOS PADRÃO DE GARANTIA (FALLBACK) ---
-const defaultProducts: Product[] = [
-  {
-    id: "p1",
-    name: "Jaqueta Jeans Vintage",
-    description: "Jaqueta jeans oversized anos 90 em excelente estado.",
-    price: 89.9,
-    size: "G",
-    category: "Roupas",
-    condition: "Seminovo",
-    image: "/products/jaqueta-jeans.png",
-    waterSaved: 5200,
-    wasteSaved: 800,
-    status: "Disponível",
-  },
-  {
-    id: "p2",
-    name: "Camisa de Linho",
-    description: "Camisa leve 100% linho, perfeita para o dia a dia.",
-    price: 55.0,
-    size: "M",
-    category: "Roupas",
-    condition: "Seminovo",
-    image: "/products/camisa-linho.png",
-    waterSaved: 3800,
-    wasteSaved: 450,
-    status: "Disponível",
-  },
-  {
-    id: "p3",
-    name: "Bota Cano Curto",
-    description: "Bota de couro sintético marrom pouco usada.",
-    price: 120.0,
-    size: "37",
-    category: "Calçados",
-    condition: "Seminovo",
-    image: "/products/botas-cano-curto.png",
-    waterSaved: 6100,
-    wasteSaved: 950,
-    status: "Disponível",
-  },
-  {
-    id: "p4",
-    name: "Bolsa de Couro",
-    description: "Bolsa estruturada vintage com alça ajustável.",
-    price: 65.0,
-    size: "Único",
-    category: "Acessórios",
-    condition: "Seminovo",
-    image: "/products/bolsa-couro.png",
-    waterSaved: 2900,
-    wasteSaved: 350,
-    status: "Reservado pelo Cliente",
-  },
-]
+const defaultProducts: Product[] = []
 
 const StoreContext = createContext<StoreValue | null>(null)
 
@@ -164,12 +111,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   )
   const clearSnackbar = useCallback(() => setSnackbar(null), [])
 
-  // --- BUSCAR DADOS DO SUPABASE ---
   const fetchAllData = useCallback(async () => {
     try {
       const { data: dbProducts, error: prodError } = await supabase
         .from("produtos")
         .select("*")
+        .order("ordem", { ascending: true })
+
       if (prodError) console.error("Erro ao buscar produtos:", prodError)
 
       if (dbProducts && dbProducts.length > 0) {
@@ -198,7 +146,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setProducts(mappedProducts)
       }
 
-      // Mensagens
       const { data: dbMessages } = await supabase.from("mensagens").select("*")
       if (dbMessages && dbMessages.length > 0) {
         setMessages(
@@ -215,7 +162,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         )
       }
 
-      // Avaliações
       const { data: dbReviews } = await supabase.from("avaliacoes").select("*")
       if (dbReviews && dbReviews.length > 0) {
         setReviews(
@@ -229,7 +175,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         )
       }
 
-      // Desapegos
       const { data: dbDesapegos } = await supabase
         .from("solicitacoes_desapego")
         .select("*")
@@ -253,10 +198,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     fetchAllData()
   }, [fetchAllData])
 
-  // --- AÇÕES DO USUÁRIO INTEGRADA AO SUPABASE ---
-
   const reserveProduct = useCallback(
-    async (id: string) => {
+    async (id: string, buyerName: string, buyerPhone: string) => {
       setProducts((prev) =>
         prev.map((p) =>
           p.id === id ? { ...p, status: "Reservado pelo Cliente" } : p,
@@ -264,9 +207,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       )
       await supabase
         .from("produtos")
-        .update({ status: "reservado" })
+        .update({
+          status: "reservado",
+          buyer_name: buyerName,
+          buyer_phone: buyerPhone,
+          reserved_at: new Date().toISOString(),
+        })
         .eq("id", id)
-      notify("Peça reservada! O brechó foi avisado para combinar a retirada.", "success")
+      notify("Peça reservada! O brechó foi avisado.", "success")
     },
     [notify],
   )
@@ -278,9 +226,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       )
       await supabase
         .from("produtos")
-        .update({ status: "disponivel" })
+        .update({
+          status: "disponivel",
+          buyer_name: null,
+          buyer_phone: null,
+          reserved_at: null,
+        })
         .eq("id", id)
-      notify("Reserva desfeita. A peça voltou a ficar disponível.", "info")
+      notify("Reserva desfeita.", "info")
     },
     [notify],
   )
@@ -288,10 +241,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const updateStatus = useCallback(
     async (id: string, status: OrderStatus) => {
       setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
-      await supabase
-        .from("produtos")
-        .update({ status: statusToDb(status) })
-        .eq("id", id)
+      await supabase.from("produtos").update({ status: statusToDb(status) }).eq("id", id)
       notify(`Status atualizado para "${status}".`, "success")
     },
     [notify],
@@ -299,6 +249,32 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const addProduct = useCallback(
     async (data: NewProductInput) => {
+      let finalImageUrl = data.image
+
+      if (data.image.startsWith("blob:")) {
+        try {
+          const response = await fetch(data.image)
+          const blobData = await response.blob()
+          const fileExt = blobData.type.split('/')[1] || 'png'
+          const fileName = `produto-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+
+          const { error: uploadError } = await supabase.storage
+            .from("produtos")
+            .upload(fileName, blobData)
+
+          if (!uploadError) {
+            const { data: publicUrlData } = supabase.storage
+              .from("produtos")
+              .getPublicUrl(fileName)
+            finalImageUrl = publicUrlData.publicUrl
+          } else {
+            console.error("Erro no upload da imagem para o Storage:", uploadError)
+          }
+        } catch (err) {
+          console.error("Erro ao converter blob para upload:", err)
+        }
+      }
+
       const { data: inserted, error } = await supabase
         .from("produtos")
         .insert([
@@ -308,7 +284,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             preco: data.price,
             tamanho: data.size,
             categoria: data.category,
-            imagem_url: data.image,
+            imagem_url: finalImageUrl,
             status: "disponivel",
           },
         ])
@@ -322,10 +298,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const product: Product = {
         id: inserted ? String(inserted.id) : `p-${Date.now()}`,
         ...data,
+        image: finalImageUrl,
         waterSaved: Math.round(3000 + Math.random() * 5000),
         wasteSaved: Math.round(400 + Math.random() * 800),
         status: "Disponível",
       }
+
       setProducts((prev) => [product, ...prev])
       notify("Novo desapego cadastrado na vitrine!", "success")
     },
@@ -411,19 +389,95 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setDesapegos((prev) =>
         prev.map((d) => (d.id === id ? { ...d, status: newStatus } : d)),
       )
-      await supabase
-        .from("solicitacoes_desapego")
-        .update({ status: newStatus })
-        .eq("id", id)
+      await supabase.from("solicitacoes_desapego").update({ status: newStatus }).eq("id", id)
 
       notify(
-        accepted
-          ? "Desapego aceito! Combine a coleta com o membro."
-          : "Solicitação recusada.",
+        accepted ? "Desapego aceito! Combine a coleta com o membro." : "Solicitação recusada.",
         accepted ? "success" : "info",
       )
     },
     [notify],
+  )
+
+  const reorderProducts = useCallback(async (activeId: string, overId: string) => {
+    setProducts((prev) => {
+      const oldIndex = prev.findIndex((p) => p.id === activeId)
+      const newIndex = prev.findIndex((p) => p.id === overId)
+      if (oldIndex === -1 || newIndex === -1) return prev
+
+      const newProducts = [...prev]
+      const [movedItem] = newProducts.splice(oldIndex, 1)
+      newProducts.splice(newIndex, 0, movedItem)
+
+      const updates = newProducts.map((p, index) => ({
+        id: p.id,
+        ordem: index + 1,
+      }))
+
+      Promise.all(
+        updates.map((u) =>
+          supabase.from("produtos").update({ ordem: u.ordem }).eq("id", u.id)
+        )
+      ).catch((err) => console.error("Erro ao salvar nova ordem:", err))
+
+      return newProducts
+    })
+  }, [])
+
+  const updateProductDetails = useCallback(
+    async (id: string, updates: Partial<Product>, imageFile?: File | null) => {
+      let finalImageUrl = updates.image
+
+      if (imageFile) {
+        try {
+          const fileExt = imageFile.name.split('.').pop() || 'png'
+          const fileName = `produto-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+
+          const { error: uploadError } = await supabase.storage
+            .from("produtos")
+            .upload(fileName, imageFile)
+
+          if (!uploadError) {
+            const { data: publicUrlData } = supabase.storage
+              .from("produtos")
+              .getPublicUrl(fileName)
+            finalImageUrl = publicUrlData.publicUrl
+          } else {
+            console.error("Erro no upload da nova imagem:", uploadError)
+          }
+        } catch (err) {
+          console.error("Erro ao processar nova imagem:", err)
+        }
+      }
+
+      const dbUpdates: any = {}
+      if (updates.name !== undefined) dbUpdates.titulo = updates.name
+      if (updates.price !== undefined) dbUpdates.preco = updates.price
+      if (updates.size !== undefined) dbUpdates.tamanho = updates.size
+      if (finalImageUrl !== undefined) dbUpdates.imagem_url = finalImageUrl
+
+      const { error } = await supabase.from("produtos").update(dbUpdates).eq("id", id)
+
+      if (error) {
+        console.error("Erro ao atualizar a peça:", error)
+        notify("Erro ao atualizar a peça.", "error")
+        return
+      }
+
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                ...updates,
+                ...(finalImageUrl ? { image: finalImageUrl } : {}),
+              }
+            : p
+        )
+      )
+      notify("Peça atualizada com sucesso!", "success")
+    },
+    [notify]
   )
 
   const value = useMemo<StoreValue>(
@@ -445,6 +499,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addReview,
       addDesapego,
       resolveDesapego,
+      reorderProducts,
+      updateProductDetails,
     }),
     [
       products,
@@ -463,6 +519,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addReview,
       addDesapego,
       resolveDesapego,
+      reorderProducts,
+      updateProductDetails,
     ],
   )
 

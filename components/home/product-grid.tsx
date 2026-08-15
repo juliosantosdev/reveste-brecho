@@ -6,6 +6,22 @@ import { Stack } from "@/components/flex"
 import Typography from "@mui/material/Typography"
 import type { Product } from "@/lib/types"
 import { ProductCard } from "./product-card"
+import { useStore } from "@/lib/store"
+
+// Importações do dnd-kit
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable"
 
 export function ProductGrid({
   products,
@@ -14,6 +30,15 @@ export function ProductGrid({
   products: Product[]
   onOpen: (p: Product) => void
 }) {
+  const { view, reorderProducts } = useStore()
+  const isVendor = view === "vendedor"
+
+  // Configura os sensores para não entrarem em conflito com cliques em botões normais
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor)
+  )
+
   if (products.length === 0) {
     return (
       <Stack alignItems="center" spacing={1.5} sx={{ py: 8, color: "text.secondary" }}>
@@ -28,7 +53,15 @@ export function ProductGrid({
     )
   }
 
-  return (
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      // Dispara a função da store para atualizar estado e o Supabase
+      reorderProducts(String(active.id), String(over.id))
+    }
+  }
+
+  const gridContent = (
     <Box
       sx={{
         display: "grid",
@@ -42,8 +75,30 @@ export function ProductGrid({
       }}
     >
       {products.map((p) => (
-        <ProductCard key={p.id} product={p} onOpen={onOpen} />
+        // A propriedade isSortable agora é passada corretamente para o card
+        <ProductCard key={p.id} product={p} onOpen={onOpen} isSortable={isVendor} />
       ))}
     </Box>
+  )
+
+  // Se for cliente, renderiza a grelha normal (sem mecânica de arrastar)
+  if (!isVendor) {
+    return gridContent
+  }
+
+  // Se for Brechó, encapsula a grelha na lógica de arrastar e soltar
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={products.map((p) => p.id)}
+        strategy={rectSortingStrategy}
+      >
+        {gridContent}
+      </SortableContext>
+    </DndContext>
   )
 }

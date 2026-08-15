@@ -15,6 +15,7 @@ import { useStore } from "@/lib/store"
 import { DesapegoInbox } from "@/components/community/desapego-inbox"
 import { KanbanBoard } from "./kanban-board"
 import { NewProductForm } from "./new-product-form"
+import { ProductGrid } from "@/components/home/product-grid"
 
 export function SellerDashboard() {
   const { products } = useStore()
@@ -85,6 +86,19 @@ export function SellerDashboard() {
           })}
         />
       </Box>
+
+      {/* NOVA SEÇÃO: ORGANIZAR VITRINE COM DRAG AND DROP */}
+      <Divider sx={{ my: 4 }} />
+      <Typography variant="h6" component="h3" sx={{ mb: 1 }}>
+        Organizar Vitrine
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        Arraste os cards abaixo para alterar a ordem de exibição na página inicial dos clientes.
+      </Typography>
+      <ProductGrid products={products} onOpen={() => {}} />
+      {/* ----------------------------------------------- */}
+
+      <Divider sx={{ my: 4 }} />
 
       <Typography variant="h6" component="h3" sx={{ mb: 2 }}>
         Fluxo de pedidos (Kanban)
