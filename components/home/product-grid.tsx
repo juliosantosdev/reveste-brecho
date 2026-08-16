@@ -65,9 +65,10 @@ export function ProductGrid({
     <Box
       sx={{
         display: "grid",
-        gap: 3,
+        // Ajuste de gap: menor no mobile (1.5) para as 2 colunas respirarem, padrão (3) no resto
+        gap: { xs: 1.5, sm: 3 },
         gridTemplateColumns: {
-          xs: "1fr",
+          xs: "repeat(2, 1fr)", // AQUI: alterado para 2 colunas no mobile
           sm: "repeat(2, 1fr)",
           md: "repeat(3, 1fr)",
           lg: "repeat(4, 1fr)",

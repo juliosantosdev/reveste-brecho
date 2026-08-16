@@ -1,68 +1,63 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import WaterDropIcon from "@mui/icons-material/WaterDrop";
-import RecyclingIcon from "@mui/icons-material/Recycling";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import EditIcon from "@mui/icons-material/Edit";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Chip from "@mui/material/Chip";
-import IconButton from "@mui/material/IconButton";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import { Stack } from "@/components/flex";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
-import type { OrderStatus, Product } from "@/lib/types";
+import { useState } from "react"
+import WaterDropIcon from "@mui/icons-material/WaterDrop"
+import RecyclingIcon from "@mui/icons-material/Recycling"
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator"
+import EditIcon from "@mui/icons-material/Edit"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Card from "@mui/material/Card"
+import CardActions from "@mui/material/CardActions"
+import CardContent from "@mui/material/CardContent"
+import CardMedia from "@mui/material/CardMedia"
+import Chip from "@mui/material/Chip"
+import IconButton from "@mui/material/IconButton"
+import Dialog from "@mui/material/Dialog"
+import DialogTitle from "@mui/material/DialogTitle"
+import DialogContent from "@mui/material/DialogContent"
+import DialogActions from "@mui/material/DialogActions"
+import TextField from "@mui/material/TextField"
+import { Stack } from "@/components/flex"
+import Tooltip from "@mui/material/Tooltip"
+import Typography from "@mui/material/Typography"
+import type { OrderStatus, Product } from "@/lib/types"
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { useStore } from "@/lib/store";
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { useStore } from "@/lib/store"
 
-const statusColor: Record<
-  OrderStatus,
-  "success" | "warning" | "info" | "default"
-> = {
+const statusColor: Record<OrderStatus, "success" | "warning" | "info" | "default"> = {
   Disponível: "success",
   "Reservado pelo Cliente": "warning",
   "Aguardando Retirada": "info",
   "Concluído/Vendido": "default",
-};
+}
 
 const brl = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
 
 export function ProductCard({
   product,
   onOpen,
   isSortable = false,
 }: {
-  product: Product;
-  onOpen: (p: Product) => void;
-  isSortable?: boolean;
+  product: Product
+  onOpen: (p: Product) => void
+  isSortable?: boolean
 }) {
-  const sold = product.status === "Concluído/Vendido";
-  const { updateProductDetails } = useStore();
+  const sold = product.status === "Concluído/Vendido"
+  const { updateProductDetails } = useStore()
 
   // Estado para controlar o modal de edição e novos campos de imagem
-  const [editOpen, setEditOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false)
   const [editForm, setEditForm] = useState({
     name: product.name,
     price: product.price,
     size: product.size,
-    description: product.description,
-    category: product.category,
-  });
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState(product.image);
+  })
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [previewImage, setPreviewImage] = useState(product.image)
 
   // Lógica de sortable do dnd-kit
   const {
@@ -72,34 +67,28 @@ export function ProductCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: product.id, disabled: !isSortable });
+  } = useSortable({ id: product.id, disabled: !isSortable })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 2 : 0,
     opacity: isDragging ? 0.8 : 1,
-  };
+  }
 
   // Função para abrir o modal com os dados atualizados
   const handleOpenEdit = () => {
-    setEditForm({
-      name: product.name,
-      price: product.price,
-      size: product.size,
-      description: product.description,
-      category: product.category,
-    });
-    setPreviewImage(product.image);
-    setImageFile(null);
-    setEditOpen(true);
-  };
+    setEditForm({ name: product.name, price: product.price, size: product.size })
+    setPreviewImage(product.image)
+    setImageFile(null)
+    setEditOpen(true)
+  }
 
   // Função para salvar a edição incluindo a nova foto se houver
   const handleSaveEdit = async () => {
-    await updateProductDetails(product.id, editForm, imageFile);
-    setEditOpen(false);
-  };
+    await updateProductDetails(product.id, editForm, imageFile)
+    setEditOpen(false)
+  }
 
   return (
     <>
@@ -109,13 +98,8 @@ export function ProductCard({
             height: "100%",
             display: "flex",
             flexDirection: "column",
-            transition: isDragging
-              ? "none"
-              : "transform 120ms ease, box-shadow 120ms ease",
-            "&:hover": {
-              transform: isDragging ? "none" : "translateY(-4px)",
-              boxShadow: isDragging ? 8 : 4,
-            },
+            transition: isDragging ? "none" : "transform 120ms ease, box-shadow 120ms ease",
+            "&:hover": { transform: isDragging ? "none" : "translateY(-4px)", boxShadow: isDragging ? 8 : 4 },
             position: "relative",
           }}
         >
@@ -134,11 +118,7 @@ export function ProductCard({
                   boxShadow: 2,
                 }}
               >
-                <IconButton
-                  size="small"
-                  onClick={handleOpenEdit}
-                  aria-label="Editar produto"
-                >
+                <IconButton size="small" onClick={handleOpenEdit} aria-label="Editar produto">
                   <EditIcon fontSize="small" color="primary" />
                 </IconButton>
               </Box>
@@ -175,10 +155,7 @@ export function ProductCard({
               height="220"
               image={product.image}
               alt={`${product.name} — ${product.condition}, tamanho ${product.size}`}
-              sx={{
-                objectFit: "cover",
-                filter: sold ? "grayscale(0.7)" : "none",
-              }}
+              sx={{ objectFit: "cover", filter: sold ? "grayscale(0.7)" : "none" }}
             />
             <Chip
               size="small"
@@ -196,18 +173,8 @@ export function ProductCard({
               {product.name}
             </Typography>
 
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ mb: 1.5 }}
-              flexWrap="wrap"
-              useFlexGap
-            >
-              <Chip
-                size="small"
-                variant="outlined"
-                label={`Tam. ${product.size}`}
-              />
+            <Stack direction="row" spacing={1} sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
+              <Chip size="small" variant="outlined" label={`Tam. ${product.size}`} />
               <Chip size="small" variant="outlined" label={product.condition} />
             </Stack>
 
@@ -238,56 +205,42 @@ export function ProductCard({
               </Stack>
             </Tooltip>
 
-            <Typography variant="h5" color="primary" sx={{ mt: 2 }}>
-              {brl(product.price)}
-            </Typography>
+            {/* AQUI: O preço só aparece se NÃO for o painel do Brechó */}
+            {!isSortable && (
+              <Typography variant="h5" color="primary" sx={{ mt: 2 }}>
+                {brl(product.price)}
+              </Typography>
+            )}
           </CardContent>
 
-          <CardActions sx={{ p: 2, pt: 0 }}>
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={() => onOpen(product)}
-              disabled={sold}
-              aria-label={`Ver detalhes e reservar ${product.name}`}
-            >
-              {sold ? "Vendido" : "Ver Detalhes & Reservar"}
-            </Button>
-          </CardActions>
+          {/* AQUI: O botão só aparece se NÃO for o painel do Brechó */}
+          {!isSortable && (
+            <CardActions sx={{ p: 2, pt: 0 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => onOpen(product)}
+                disabled={sold}
+                aria-label={`Ver detalhes e reservar ${product.name}`}
+              >
+                {sold ? "Vendido" : "Ver Detalhes & Reservar"}
+              </Button>
+            </CardActions>
+          )}
         </Card>
       </Box>
 
       {/* Modal de Edição Completo */}
-      <Dialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Editar Informações da Peça</DialogTitle>
-        <DialogContent
-          sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 2 }}
-        >
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 2 }}>
           {/* Seção de Troca de Foto */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 1.5,
-            }}
-          >
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1.5 }}>
             <Box
               component="img"
               src={previewImage}
               alt="Preview da peça"
-              sx={{
-                width: 100,
-                height: 100,
-                objectFit: "cover",
-                borderRadius: 2,
-                boxShadow: 1,
-              }}
+              sx={{ width: 100, height: 100, objectFit: "cover", borderRadius: 2, boxShadow: 1 }}
             />
             <Button variant="outlined" component="label" size="small">
               Trocar Foto
@@ -297,9 +250,9 @@ export function ProductCard({
                 accept="image/*"
                 onChange={(e) => {
                   if (e.target.files?.[0]) {
-                    const file = e.target.files[0];
-                    setImageFile(file);
-                    setPreviewImage(URL.createObjectURL(file));
+                    const file = e.target.files[0]
+                    setImageFile(file)
+                    setPreviewImage(URL.createObjectURL(file))
                   }
                 }}
               />
@@ -317,9 +270,7 @@ export function ProductCard({
             label="Preço (R$)"
             type="number"
             value={editForm.price}
-            onChange={(e) =>
-              setEditForm({ ...editForm, price: Number(e.target.value) })
-            }
+            onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
             fullWidth
           />
           <TextField
@@ -327,24 +278,6 @@ export function ProductCard({
             value={editForm.size}
             onChange={(e) => setEditForm({ ...editForm, size: e.target.value })}
             fullWidth
-          />
-          <TextField
-            label="Categoria"
-            value={editForm.category}
-            onChange={(e) =>
-              setEditForm({ ...editForm, category: e.target.value })
-            }
-            fullWidth
-          />
-          <TextField
-            label="Descrição"
-            value={editForm.description}
-            onChange={(e) =>
-              setEditForm({ ...editForm, description: e.target.value })
-            }
-            fullWidth
-            multiline
-            rows={2}
           />
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
@@ -355,5 +288,5 @@ export function ProductCard({
         </DialogActions>
       </Dialog>
     </>
-  );
+  )
 }
