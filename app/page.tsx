@@ -12,18 +12,27 @@ import { ProductDetailDialog } from "@/components/product-detail-dialog"
 import { SellerDashboard } from "@/components/admin/seller-dashboard"
 import { ReviewsSection } from "@/components/community/reviews-section"
 import { DesapegoCta } from "@/components/community/desapego-cta"
+import {
+  MobileBottomNav,
+  type ClientTab,
+  type VendorTab,
+} from "@/components/mobile-bottom-nav"
+import { Stack } from "@/components/flex"
 import { useStore } from "@/lib/store"
 import type { Category, Product } from "@/lib/types"
 
 export default function Page() {
   const { products, view } = useStore()
-  
+
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<Category | "Todas">("Todas")
   const [selected, setSelected] = useState<Product | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  // Filtro seguro contra dados nulos
+  // Controle das abas inferiores no mobile
+  const [clientTab, setClientTab] = useState<ClientTab>("vitrine")
+  const [vendorTab, setVendorTab] = useState<VendorTab>("vitrine")
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
 
@@ -62,37 +71,86 @@ export default function Page() {
         search={search}
         onSearch={setSearch}
         category={category}
-        onCategory={setCategory}
+        onCategory={(cat) => {
+          setCategory(cat)
+          setClientTab("vitrine")
+        }}
       />
 
-      <Container maxWidth="lg" component="main" sx={{ py: 4 }}>
+      <Container
+        maxWidth="lg"
+        component="main"
+        sx={{
+          pt: { xs: 2, md: 3.5 },
+          pb: { xs: 11, md: 4 },
+        }}
+      >
         {view === "cliente" ? (
           <>
-            <Banner />
+            {/* Aba Vitrine (Hero Editorial + Catálogo) */}
+            <Box
+              sx={{
+                display: { xs: clientTab === "vitrine" ? "block" : "none", md: "block" },
+              }}
+            >
+              <Banner products={products} onOpen={openProduct} />
 
-            <Box component="section" aria-labelledby="catalog-title" sx={{ mb: 5 }}>
-              <Typography id="catalog-title" variant="h4" component="h2" sx={{ mb: 0.5 }}>
-                Vitrine de peças
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                {filtered.length} peça{filtered.length === 1 ? "" : "s"} para dar um novo
-                ciclo de vida.
-              </Typography>
-              <ProductGrid products={filtered} onOpen={openProduct} />
+              <Box component="section" aria-labelledby="catalog-title" sx={{ mb: { xs: 2, md: 5 } }}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="baseline"
+                  sx={{ mb: 2 }}
+                >
+                  <Typography
+                    id="catalog-title"
+                    variant="h5"
+                    component="h2"
+                    sx={{ fontWeight: 800, fontSize: { xs: "1.2rem", md: "1.5rem" } }}
+                  >
+                    Vitrine de peças
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                    {filtered.length} {filtered.length === 1 ? "peça" : "peças"}
+                  </Typography>
+                </Stack>
+
+                <ProductGrid products={filtered} onOpen={openProduct} />
+              </Box>
             </Box>
 
-            <Divider sx={{ my: 5 }} />
+            <Divider sx={{ my: 5, display: { xs: "none", md: "block" } }} />
 
-            <Box sx={{ mb: 5 }}>
+            {/* Aba Desapegar */}
+            <Box
+              sx={{
+                mb: { xs: 2, md: 5 },
+                display: { xs: clientTab === "desapegar" ? "block" : "none", md: "block" },
+              }}
+            >
               <DesapegoCta />
             </Box>
 
-            <ReviewsSection />
+            {/* Aba Reputação */}
+            <Box
+              sx={{
+                display: { xs: clientTab === "reputacao" ? "block" : "none", md: "block" },
+              }}
+            >
+              <ReviewsSection />
+            </Box>
           </>
         ) : (
-          <SellerDashboard />
+          <SellerDashboard mobileTab={vendorTab} />
         )}
       </Container>
+
+      <MobileBottomNav
+        clientTab={clientTab}
+        onClientTabChange={setClientTab}
+        vendorTab={vendorTab}
+        onVendorTabChange={setVendorTab}
+      />
 
       <ProductDetailDialog
         product={liveSelected}

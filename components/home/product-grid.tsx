@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied"
 import Box from "@mui/material/Box"
 import { Stack } from "@/components/flex"
@@ -8,7 +9,6 @@ import type { Product } from "@/lib/types"
 import { ProductCard } from "./product-card"
 import { useStore } from "@/lib/store"
 
-// Importações do dnd-kit
 import {
   DndContext,
   closestCenter,
@@ -32,8 +32,8 @@ export function ProductGrid({
 }) {
   const { view, reorderProducts } = useStore()
   const isVendor = view === "vendedor"
+  const [activeCardId, setActiveCardId] = useState<string | null>(null)
 
-  // Configura os sensores para não entrarem em conflito com cliques em botões normais
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor)
@@ -56,50 +56,85 @@ export function ProductGrid({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (over && active.id !== over.id) {
-      // Dispara a função da store para atualizar estado e o Supabase
       reorderProducts(String(active.id), String(over.id))
     }
   }
 
-  const gridContent = (
-    <Box
-      sx={{
-        display: "grid",
-        // Ajuste de gap: menor no mobile (1.5) para as 2 colunas respirarem, padrão (3) no resto
-        gap: { xs: 1.5, sm: 3 },
-        gridTemplateColumns: {
-          xs: "repeat(2, 1fr)", // AQUI: alterado para 2 colunas no mobile
-          sm: "repeat(2, 1fr)",
-          md: "repeat(3, 1fr)",
-          lg: "repeat(4, 1fr)",
-        },
-      }}
-    >
-      {products.map((p) => (
-        // A propriedade isSortable agora é passada corretamente para o card
-        <ProductCard key={p.id} product={p} onOpen={onOpen} isSortable={isVendor} />
-      ))}
-    </Box>
-  )
-
-  // Se for cliente, renderiza a grelha normal (sem mecânica de arrastar)
-  if (!isVendor) {
-    return gridContent
+  if (isVendor) {
+    return (
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={products.map((p) => p.id)}
+          strategy={rectSortingStrategy}
+        >
+          <Box
+            sx={{
+              display: "grid",
+              gap: { xs: 1.5, sm: 3 },
+              gridTemplateColumns: {
+                xs: "repeat(2, 1fr)",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(4, 1fr)",
+              },
+            }}
+          >
+            {products.map((p) => (
+              <ProductCard key={p.id} product={p} onOpen={onOpen} isSortable />
+            ))}
+          </Box>
+        </SortableContext>
+      </DndContext>
+    )
   }
 
-  // Se for Brechó, encapsula a grelha na lógica de arrastar e soltar
+  // Agrupa em colunas pareadas (topo + base) para manter combinação de looks no mobile e desktop
+  const lookColumns: Product[][] = []
+  for (let i = 0; i < products.length; i += 4) {
+    const chunk = products.slice(i, i + 4)
+    if (chunk.length >= 3) {
+      lookColumns.push([chunk[0], chunk[2]])
+      if (chunk[1] || chunk[3]) {
+        lookColumns.push([chunk[1], chunk[3]].filter(Boolean))
+      }
+    } else {
+      chunk.forEach((item) => lookColumns.push([item]))
+    }
+  }
+
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
+    <Box
+      onClick={() => setActiveCardId(null)}
+      sx={{
+        display: "grid",
+        gap: { xs: 1.5, sm: 3 },
+        gridTemplateColumns: {
+          xs: "repeat(2, 1fr)",
+          sm: "repeat(2, 1fr)",
+          md: "repeat(4, 1fr)",
+        },
+        alignItems: "start",
+      }}
     >
-      <SortableContext
-        items={products.map((p) => p.id)}
-        strategy={rectSortingStrategy}
-      >
-        {gridContent}
-      </SortableContext>
-    </DndContext>
+      {lookColumns.map((col, colIndex) => (
+        <Stack key={colIndex} spacing={{ xs: 1.5, sm: 3 }}>
+          {col.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={p}
+              onOpen={onOpen}
+              isSortable={false}
+              isMobileExpanded={activeCardId === p.id}
+              onMobileToggle={(id) =>
+                setActiveCardId((prev) => (prev === id ? null : id))
+              }
+            />
+          ))}
+        </Stack>
+      ))}
+    </Box>
   )
 }

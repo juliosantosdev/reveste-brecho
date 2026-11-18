@@ -47,6 +47,7 @@ interface StoreValue {
   resolveDesapego: (id: string, accepted: boolean) => void
   reorderProducts: (activeId: string, overId: string) => void
   updateProductDetails: (id: string, updates: Partial<Product>, imageFile?: File | null) => Promise<void>
+  deleteProduct: (id: string) => Promise<void>
 }
 
 export interface NewProductInput {
@@ -183,8 +184,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           dbDesapegos.map((d) => ({
             id: String(d.id),
             memberName: d.nome_usuario,
-            email: d.email_usuario,
-            pieceDescription: d.descricao_peca,
+            category: "Roupas",
+            itemName: "Desapego",
+            description: d.descricao_peca,
+            contact: d.email_usuario,
             status: d.status as "Pendente" | "Aceito" | "Recusado",
           })),
         )
@@ -255,7 +258,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         try {
           const response = await fetch(data.image)
           const blobData = await response.blob()
-          const fileExt = blobData.type.split('/')[1] || 'png'
+          const fileExt = blobData.type.split("/")[1] || "png"
           const fileName = `produto-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
 
           const { error: uploadError } = await supabase.storage
@@ -364,8 +367,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         .insert([
           {
             nome_usuario: data.memberName,
-            email_usuario: data.email,
-            descricao_peca: data.pieceDescription,
+            email_usuario: data.contact,
+            descricao_peca: `${data.itemName} - ${data.description}`,
             status: "Pendente",
           },
         ])
@@ -416,8 +419,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       Promise.all(
         updates.map((u) =>
-          supabase.from("produtos").update({ ordem: u.ordem }).eq("id", u.id)
-        )
+          supabase.from("produtos").update({ ordem: u.ordem }).eq("id", u.id),
+        ),
       ).catch((err) => console.error("Erro ao salvar nova ordem:", err))
 
       return newProducts
@@ -430,7 +433,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       if (imageFile) {
         try {
-          const fileExt = imageFile.name.split('.').pop() || 'png'
+          const fileExt = imageFile.name.split(".").pop() || "png"
           const fileName = `produto-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
 
           const { error: uploadError } = await supabase.storage
@@ -450,7 +453,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      const dbUpdates: any = {}
+      const dbUpdates: Record<string, unknown> = {}
       if (updates.name !== undefined) dbUpdates.titulo = updates.name
       if (updates.price !== undefined) dbUpdates.preco = updates.price
       if (updates.size !== undefined) dbUpdates.tamanho = updates.size
@@ -472,12 +475,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 ...updates,
                 ...(finalImageUrl ? { image: finalImageUrl } : {}),
               }
-            : p
-        )
+            : p,
+        ),
       )
       notify("Peça atualizada com sucesso!", "success")
     },
-    [notify]
+    [notify],
+  )
+
+  const deleteProduct = useCallback(
+    async (id: string) => {
+      const target = products.find((p) => p.id === id)
+
+      const { error } = await supabase.from("produtos").delete().eq("id", id)
+
+      if (error) {
+        console.error("Erro ao excluir peça:", error)
+        notify("Erro ao excluir a peça.", "error")
+        return
+      }
+
+      if (target?.image && target.image.includes("/storage/v1/object/public/produtos/")) {
+        const fileName = target.image.split("/produtos/")[1]
+        if (fileName) {
+          await supabase.storage.from("produtos").remove([fileName])
+        }
+      }
+
+      setProducts((prev) => prev.filter((p) => p.id !== id))
+      notify("Peça removida da vitrine.", "info")
+    },
+    [products, notify],
   )
 
   const value = useMemo<StoreValue>(
@@ -501,6 +529,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       resolveDesapego,
       reorderProducts,
       updateProductDetails,
+      deleteProduct,
     }),
     [
       products,
@@ -521,6 +550,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       resolveDesapego,
       reorderProducts,
       updateProductDetails,
+      deleteProduct,
     ],
   )
 

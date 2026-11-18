@@ -9,7 +9,6 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -124,49 +123,34 @@ export function Header({
           borderColor: "divider",
         }}
       >
-        <Toolbar sx={{ flexWrap: "wrap", gap: 2, py: 1.5 }}>
+        <Toolbar sx={{ flexWrap: "wrap", gap: { xs: 1.25, sm: 2 }, py: { xs: 1, sm: 1.5 } }}>
           <Stack
             direction="row"
             alignItems="center"
             spacing={1}
             sx={{ mr: "auto" }}
           >
-            {/* Logo nova integrada mantendo o tamanho e proporção */}
             <Box
               component="img"
               src="/logo-brecho.png"
               alt="Logo ReVeste"
-              sx={{ width: 60, height: 60, objectFit: "contain" }}
+              sx={{ width: { xs: 44, sm: 56 }, height: { xs: 44, sm: 56 }, objectFit: "contain" }}
             />
             <Box>
-              <Typography variant="h6" component="p" sx={{ lineHeight: 1 }}>
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{ lineHeight: 1, fontWeight: 800, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+              >
                 ReVeste
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
                 Moda circular colaborativa
               </Typography>
             </Box>
           </Stack>
 
-          <TextField
-            size="small"
-            value={search}
-            onChange={(e) => onSearch(e.target.value)}
-            placeholder="Buscar peças..."
-            aria-label="Buscar peças no brechó"
-            sx={{ flex: "1 1 240px", maxWidth: 380 }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" aria-hidden />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" alignItems="center" spacing={0.75}>
             <ToggleButtonGroup
               value={view}
               exclusive
@@ -175,11 +159,19 @@ export function Header({
               onChange={handleViewChange}
               aria-label="Alternar visão da aplicação"
             >
-              <ToggleButton value="cliente" aria-label="Visão do cliente">
+              <ToggleButton
+                value="cliente"
+                aria-label="Visão do cliente"
+                sx={{ px: { xs: 1.25, sm: 1.75 }, py: 0.5, fontSize: "0.78rem" }}
+              >
                 <ShoppingBagIcon fontSize="small" sx={{ mr: 0.5 }} aria-hidden />
                 Comprador
               </ToggleButton>
-              <ToggleButton value="vendedor" aria-label="Visão do vendedor">
+              <ToggleButton
+                value="vendedor"
+                aria-label="Visão do vendedor"
+                sx={{ px: { xs: 1.25, sm: 1.75 }, py: 0.5, fontSize: "0.78rem" }}
+              >
                 <StorefrontIcon fontSize="small" sx={{ mr: 0.5 }} aria-hidden />
                 Brechó
               </ToggleButton>
@@ -198,34 +190,92 @@ export function Header({
               </Tooltip>
             )}
           </Stack>
+
+          <TextField
+            size="small"
+            value={search}
+            onChange={(e) => onSearch(e.target.value)}
+            placeholder="Buscar peças..."
+            aria-label="Buscar peças no brechó"
+            sx={{
+              flex: { xs: "1 1 100%", md: "1 1 240px" },
+              maxWidth: { md: 340 },
+              order: { xs: 3, md: 2 },
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 99,
+                bgcolor: "background.default",
+                height: 38,
+                fontSize: "0.85rem",
+              },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" aria-hidden />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
         </Toolbar>
 
+        {/* Abas de categoria minimalistas (estilo referência editorial) */}
         {view === "cliente" && (
           <Box
             component="nav"
             aria-label="Filtro de categorias"
             sx={{
-              px: 2,
-              pb: 1.5,
+              px: { xs: 2, sm: 3 },
               display: "flex",
-              gap: 1,
-              flexWrap: "wrap",
-              borderTop: "1px solid",
-              borderColor: "divider",
-              pt: 1.5,
+              gap: { xs: 2.5, sm: 3.5 },
+              overflowX: "auto",
+              "&::-webkit-scrollbar": { display: "none" },
+              scrollbarWidth: "none",
             }}
           >
-            {categories.map((c) => (
-              <Chip
-                key={c}
-                label={c}
-                onClick={() => onCategory(c)}
-                color={category === c ? "primary" : "default"}
-                variant={category === c ? "filled" : "outlined"}
-                aria-pressed={category === c}
-                clickable
-              />
-            ))}
+            {categories.map((c) => {
+              const active = category === c;
+              return (
+                <Box
+                  key={c}
+                  component="button"
+                  type="button"
+                  onClick={() => onCategory(c)}
+                  aria-pressed={active}
+                  sx={{
+                    position: "relative",
+                    border: "none",
+                    background: "transparent",
+                    cursor: "pointer",
+                    py: 1,
+                    px: 0.25,
+                    whiteSpace: "nowrap",
+                    fontFamily: "inherit",
+                    fontSize: "0.85rem",
+                    fontWeight: active ? 800 : 500,
+                    color: active ? "text.primary" : "text.secondary",
+                    transition: "color 150ms ease",
+                    "&:hover": { color: "text.primary" },
+                  }}
+                >
+                  {c}
+                  {active && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: 2.5,
+                        borderRadius: 2,
+                        bgcolor: "primary.main",
+                      }}
+                    />
+                  )}
+                </Box>
+              );
+            })}
           </Box>
         )}
       </AppBar>
@@ -261,7 +311,6 @@ export function Header({
               fullWidth
               size="small"
               value={email}
-              invalid={Boolean(loginError)}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@reveste.com"
               required
