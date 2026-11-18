@@ -164,7 +164,7 @@ export function WelcomeScreen({
           >
             ReVeste
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography component="p" variant="body2" color="text.secondary">
             Moda circular colaborativa
           </Typography>
         </Stack>
@@ -172,6 +172,7 @@ export function WelcomeScreen({
         {step === "select" && (
           <Stack spacing={2}>
             <Typography
+              component="p"
               variant="subtitle1"
               sx={{ fontWeight: 700, textAlign: "center", mb: 0.5 }}
             >
@@ -224,12 +225,17 @@ export function WelcomeScreen({
             <Stack spacing={2}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <KeyIcon color="primary" fontSize="small" />
-                <Typography variant="subtitle1" fontWeight={800}>
+                <Typography component="span" variant="subtitle1" sx={{ fontWeight: 800 }}>
                   Código de Verificação
                 </Typography>
               </Stack>
 
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                component="p"
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontWeight: 400 }}
+              >
                 Digite o código de acesso exclusivo da equipe para liberar a área de login do brechó.
               </Typography>
 
@@ -282,12 +288,17 @@ export function WelcomeScreen({
             <Stack spacing={2}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <LockOutlinedIcon color="primary" fontSize="small" />
-                <Typography variant="subtitle1" fontWeight={800}>
+                <Typography component="span" variant="subtitle1" sx={{ fontWeight: 800 }}>
                   Login Administrativo
                 </Typography>
               </Stack>
 
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                component="p"
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontWeight: 400 }}
+              >
                 Código validado. Confirme a senha da conta vinculada para acessar o painel.
               </Typography>
 
@@ -348,3 +359,14 @@ export function WelcomeScreen({
     </Box>
   );
 }
+```[cite: 25]
+
+### Próximos passos
+
+* Teste localmente com `pnpm run build` para confirmar que a verificação de tipos passa sem erros[cite: 24, 25].
+* Faça *commit* e *push* para a *branch* `main`[cite: 23, 25]:
+
+```bash
+git add components/welcome-screen.tsx
+git commit -m "fix(types): ajusta props component e fontWeight no Typography do WelcomeScreen"
+git push origin main
