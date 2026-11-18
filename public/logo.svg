@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <style>
+    /* Ciclo de caminhada da perna dianteira (levanta e vai para frente) */
+    @keyframes walkFrontLeg {
+      0%, 100% { transform: rotate(0deg) translate(0, 0); }
+      35% { transform: rotate(-14deg) translate(-4px, -6px); }
+      70% { transform: rotate(6deg) translate(2px, 0); }
+    }
+
+    /* Ciclo de caminhada da perna traseira (movimento alternado) */
+    @keyframes walkBackLeg {
+      0%, 100% { transform: rotate(0deg) translate(0, 0); }
+      35% { transform: rotate(10deg) translate(4px, -2px); }
+      70% { transform: rotate(-8deg) translate(-3px, -5px); }
+    }
+
+    /* Leve balanço do corpo acompanhando a passada */
+    @keyframes bodySway {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      35% { transform: translateY(-2.5px) rotate(-0.5deg); }
+      70% { transform: translateY(-1px) rotate(0.5deg); }
+    }
+
+    .sombra-chao {
+      transform-origin: 256px 420px;
+    }
+
+    .corpo-capivara {
+      animation: bodySway 1.1s ease-in-out infinite;
+      transform-origin: 256px 300px;
+    }
+
+    .perna-dianteira {
+      animation: walkFrontLeg 1.1s ease-in-out infinite;
+      transform-origin: 320px 330px;
+    }
+
+    .perna-traseira {
+      animation: walkBackLeg 1.1s ease-in-out infinite;
+      transform-origin: 195px 345px;
+    }
+  </style>
+
+  <!-- Sombra fixa no chão (não sai do lugar) -->
+  <ellipse class="sombra-chao" cx="256" cy="425" rx="150" ry="24" fill="#1b3b24" opacity="0.85" />
+
+  <!-- Grupo em movimento -->
+  <g class="corpo-capivara">
+    
+    <!-- Perna Traseira (Direita) -->
+    <path class="perna-traseira" fill="#1b3b24" d="M165,340 C175,370 182,398 190,422 C204,424 212,416 215,400 C210,380 200,355 190,335 Z" />
+
+    <!-- Tronco, Cabeça e Detalhes da Capivara -->
+    <path fill="#1b3b24" d="M102,328 C84,312 70,292 62,268 C56,248 59,228 73,208 C88,188 112,168 140,148 C168,128 198,118 222,121 C232,123 239,130 237,140 C235,147 227,152 219,150 C198,144 173,152 153,164 C133,176 118,191 113,206 C128,201 148,201 168,206 C208,216 258,231 303,236 C348,241 383,221 403,191 C413,176 416,161 413,146 C411,136 418,129 428,133 C443,141 450,161 446,186 C440,226 418,276 388,306 C358,336 318,376 298,401 C288,413 268,416 248,413 C200,406 150,381 102,328 Z" />
+
+    <!-- Pelos e Texturas das Costas -->
+    <path fill="#ffffff" opacity="0.95" d="M135,178 Q175,188 215,181 M170,188 Q200,198 230,191 M328,201 Q358,221 388,206 M338,213 Q363,229 390,219 M383,241 Q403,266 396,291 M390,251 Q403,271 393,286" stroke="#1b3b24" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Olho fechado sorrindo -->
+    <path d="M86,225 Q96,235 108,229" stroke="#1b3b24" stroke-width="4.5" stroke-linecap="round" fill="none" />
+    
+    <!-- Focinho -->
+    <ellipse cx="72" cy="248" rx="4" ry="7" fill="#ffffff" opacity="0.9" />
+
+    <!-- Perna Dianteira (Esquerda) -->
+    <path class="perna-dianteira" fill="#1b3b24" d="M295,325 C302,365 312,398 322,420 C336,422 344,410 345,395 C338,365 325,338 310,318 Z" />
+
+  </g>
+</svg>

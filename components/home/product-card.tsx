@@ -52,7 +52,6 @@ export function ProductCard({
   const sold = product.status === "Concluído/Vendido"
   const { updateProductDetails, deleteProduct } = useStore()
 
-  // Detecta se o dispositivo tem mouse real (desktop) ou tela touch (mobile/tablet)
   const canHover = useMediaQuery("(hover: hover) and (pointer: fine)")
 
   const [editOpen, setEditOpen] = useState(false)
@@ -110,13 +109,12 @@ export function ProductCard({
       return
     }
 
-    // No Desktop (com mouse), o hover já mostra o overlay e o clique abre direto o modal
     if (canHover) {
       if (!sold) onOpen(product)
       return
     }
 
-    // No Mobile (touch): 1º toque anima o overlay para cima; 2º toque abre o modal
+    // Comportamento tátil mobile: 1º toque expande, 2º toque abre o modal
     if (!isMobileExpanded) {
       onMobileToggle?.(product.id)
     } else if (!sold) {
@@ -138,8 +136,8 @@ export function ProductCard({
             transition: isDragging
               ? "none"
               : "transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms ease",
-            transform: !canHover && isMobileExpanded ? "scale(0.985)" : "none",
-            boxShadow: !canHover && isMobileExpanded ? 6 : 1,
+            transform: isMobileExpanded ? "scale(0.985)" : "none",
+            boxShadow: isMobileExpanded ? 6 : 1,
             ...(canHover && {
               "&:hover": {
                 transform: isDragging ? "none" : "translateY(-3px)",
@@ -153,7 +151,6 @@ export function ProductCard({
             }),
           }}
         >
-          {/* Botões do Painel do Brechó */}
           {isSortable && (
             <>
               <Box
@@ -199,7 +196,6 @@ export function ProductCard({
             </>
           )}
 
-          {/* Foto ocupando 100% do card */}
           <CardMedia
             component="img"
             image={product.image}
@@ -210,12 +206,11 @@ export function ProductCard({
               objectFit: "cover",
               display: "block",
               transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
-              transform: !canHover && isMobileExpanded ? "scale(1.04)" : "scale(1)",
+              transform: isMobileExpanded ? "scale(1.04)" : "scale(1)",
               filter: sold ? "grayscale(0.75)" : "none",
             }}
           />
 
-          {/* Badge de Status */}
           <Chip
             size="small"
             label={product.status}
@@ -232,7 +227,7 @@ export function ProductCard({
             }}
           />
 
-          {/* Overlay animado (Hover no Desktop / 1º Toque no Mobile) */}
+          {/* Overlay ativado por hover no desktop ou por toque (isMobileExpanded) no mobile */}
           <Box
             className="card-overlay"
             sx={{
@@ -245,9 +240,9 @@ export function ProductCard({
               flexDirection: "column",
               justifyContent: "flex-end",
               p: { xs: 1.25, sm: 2 },
-              opacity: !canHover && isMobileExpanded ? 1 : 0,
-              transform: !canHover && isMobileExpanded ? "translateY(0)" : "translateY(14px)",
-              pointerEvents: !canHover && isMobileExpanded ? "auto" : "none",
+              opacity: isMobileExpanded ? 1 : 0,
+              transform: isMobileExpanded ? "translateY(0)" : "translateY(14px)",
+              pointerEvents: isMobileExpanded ? "auto" : "none",
               transition:
                 "opacity 240ms cubic-bezier(0.22, 1, 0.36, 1), transform 240ms cubic-bezier(0.22, 1, 0.36, 1)",
               zIndex: 4,
@@ -356,7 +351,6 @@ export function ProductCard({
         </Card>
       </Box>
 
-      {/* Modal de Edição Completo */}
       <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Editar Informações da Peça</DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 2 }}>
@@ -423,7 +417,6 @@ export function ProductCard({
         </DialogActions>
       </Dialog>
 
-      {/* Modal de Confirmação de Exclusão */}
       <Dialog
         open={confirmDeleteOpen}
         onClose={() => !deleting && setConfirmDeleteOpen(false)}
@@ -435,7 +428,7 @@ export function ProductCard({
           <Typography variant="body2" color="text.secondary">
             Tem certeza que deseja excluir <strong>{product.name}</strong>? Essa ação remove a peça
             permanentemente do catálogo.
-          </Typography> 
+          </Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
           <Button onClick={() => setConfirmDeleteOpen(false)} disabled={deleting}>

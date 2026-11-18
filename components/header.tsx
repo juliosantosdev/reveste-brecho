@@ -123,74 +123,79 @@ export function Header({
           borderColor: "divider",
         }}
       >
-        <Toolbar sx={{ flexWrap: "wrap", gap: { xs: 1.25, sm: 2 }, py: { xs: 1, sm: 1.5 } }}>
+        <Toolbar sx={{ flexDirection: "column", alignItems: "stretch", gap: 1.25, py: 1.25 }}>
+          {/* Linha Superior: Logo, Nome, Botões Comprador/Brechó e Logout alinhados */}
           <Stack
             direction="row"
             alignItems="center"
-            spacing={1}
-            sx={{ mr: "auto" }}
+            justifyContent="space-between"
+            sx={{ width: "100%" }}
           >
-            <Box
-              component="img"
-              src="/logo-brecho.png"
-              alt="Logo ReVeste"
-              sx={{ width: { xs: 44, sm: 56 }, height: { xs: 44, sm: 56 }, objectFit: "contain" }}
-            />
-            <Box>
-              <Typography
-                variant="h6"
-                component="p"
-                sx={{ lineHeight: 1, fontWeight: 800, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
-              >
-                ReVeste
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
-                Moda circular colaborativa
-              </Typography>
-            </Box>
-          </Stack>
-
-          <Stack direction="row" alignItems="center" spacing={0.75}>
-            <ToggleButtonGroup
-              value={view}
-              exclusive
-              size="small"
-              color="primary"
-              onChange={handleViewChange}
-              aria-label="Alternar visão da aplicação"
-            >
-              <ToggleButton
-                value="cliente"
-                aria-label="Visão do cliente"
-                sx={{ px: { xs: 1.25, sm: 1.75 }, py: 0.5, fontSize: "0.78rem" }}
-              >
-                <ShoppingBagIcon fontSize="small" sx={{ mr: 0.5 }} aria-hidden />
-                Comprador
-              </ToggleButton>
-              <ToggleButton
-                value="vendedor"
-                aria-label="Visão do vendedor"
-                sx={{ px: { xs: 1.25, sm: 1.75 }, py: 0.5, fontSize: "0.78rem" }}
-              >
-                <StorefrontIcon fontSize="small" sx={{ mr: 0.5 }} aria-hidden />
-                Brechó
-              </ToggleButton>
-            </ToggleButtonGroup>
-
-            {view === "vendedor" && isAuthenticated && (
-              <Tooltip title="Sair do painel administrativo">
-                <IconButton
-                  size="small"
-                  color="default"
-                  onClick={handleLogout}
-                  aria-label="Encerrar sessão do brechó"
+            {/* Esquerda: Logo + Título */}
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Box
+                component="img"
+                src="/logo-brecho.png"
+                alt="Logo ReVeste"
+                sx={{ width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, objectFit: "contain" }}
+              />
+              <Box>
+                <Typography
+                  variant="h6"
+                  component="p"
+                  sx={{ lineHeight: 1.1, fontWeight: 800, fontSize: { xs: "1.05rem", sm: "1.2rem" } }}
                 >
-                  <LogoutIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
+                  ReVeste
+                </Typography>
+               
+              </Box>
+            </Stack>
+
+            {/* Direita: Botões Comprador/Brechó + Logout compactos */}
+            <Stack direction="row" alignItems="center" spacing={0.75}>
+              <ToggleButtonGroup
+                value={view}
+                exclusive
+                size="small"
+                color="primary"
+                onChange={handleViewChange}
+                aria-label="Alternar visão da aplicação"
+              >
+                <ToggleButton
+                  value="cliente"
+                  aria-label="Visão do cliente"
+                  sx={{ px: { xs: 1, sm: 1.25 }, py: 0.4, fontSize: "0.74rem" }}
+                >
+                  <ShoppingBagIcon fontSize="small" sx={{ mr: 0.3 }} aria-hidden />
+                  Comprador
+                </ToggleButton>
+                <ToggleButton
+                  value="vendedor"
+                  aria-label="Visão do vendedor"
+                  sx={{ px: { xs: 1, sm: 1.25 }, py: 0.4, fontSize: "0.74rem" }}
+                >
+                  <StorefrontIcon fontSize="small" sx={{ mr: 0.3 }} aria-hidden />
+                  Brechó
+                </ToggleButton>
+              </ToggleButtonGroup>
+
+              {view === "vendedor" && isAuthenticated && (
+                <Tooltip title="Sair do painel administrativo">
+                  <IconButton
+                    size="small"
+                    color="default"
+                    onClick={handleLogout}
+                    aria-label="Encerrar sessão do brechó"
+                    sx={{ border: "1px solid", borderColor: "divider", p: 0.5 }}
+                  >
+                    <LogoutIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Stack>
           </Stack>
 
+          {/* Barra de Busca logo abaixo */}
           <TextField
             size="small"
             value={search}
@@ -198,9 +203,7 @@ export function Header({
             placeholder="Buscar peças..."
             aria-label="Buscar peças no brechó"
             sx={{
-              flex: { xs: "1 1 100%", md: "1 1 240px" },
-              maxWidth: { md: 340 },
-              order: { xs: 3, md: 2 },
+              width: "100%",
               "& .MuiOutlinedInput-root": {
                 borderRadius: 99,
                 bgcolor: "background.default",
@@ -220,7 +223,7 @@ export function Header({
           />
         </Toolbar>
 
-        {/* Abas de categoria minimalistas (estilo referência editorial) */}
+        {/* Abas de categoria minimalistas */}
         {view === "cliente" && (
           <Box
             component="nav"

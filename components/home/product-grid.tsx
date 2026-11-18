@@ -91,7 +91,7 @@ export function ProductGrid({
     )
   }
 
-  // Agrupa em colunas pareadas (topo + base) para manter combinação de looks no mobile e desktop
+  // Agrupa em colunas pareadas (topo + base) para manter a combinação de looks no mobile e desktop
   const lookColumns: Product[][] = []
   for (let i = 0; i < products.length; i += 4) {
     const chunk = products.slice(i, i + 4)

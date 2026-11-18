@@ -66,38 +66,109 @@ export function DesapegoCta() {
       component="section"
       aria-labelledby="desapego-cta-title"
       sx={{
-        bgcolor: "secondary.main",
-        color: "secondary.contrastText",
+        position: "relative",
         borderRadius: 4,
+        overflow: "hidden",
+        // Gradiente terracota acolhedor exclusivo desta seção
+        background: "linear-gradient(145deg, #a75225 0%, #bd5e2b 55%, #94461e 100%)",
+        color: "#ffffff",
         p: { xs: 3, md: 4 },
-        display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        alignItems: { md: "center" },
-        gap: 2,
+        // Cavidade 3D (inset) + Glassmorphism externo translúcido com brilho nas bordas
+        boxShadow: `
+          inset 0 12px 28px rgba(60, 20, 8, 0.75),
+          inset 0 -8px 16px rgba(130, 65, 30, 0.5),
+          inset 0 1px 3px rgba(255, 255, 255, 0.3),
+          0 16px 36px rgba(150, 75, 35, 0.25),
+          0 0 0 1.5px rgba(255, 255, 255, 0.3),
+          0 0 24px rgba(255, 255, 255, 0.1)
+        `,
       }}
     >
-      <VolunteerActivismIcon sx={{ fontSize: 48 }} aria-hidden />
-      <Box sx={{ flex: 1 }}>
-        <Typography id="desapego-cta-title" variant="h5" component="h3">
-          Tem peças paradas no armário?
-        </Typography>
-        <Typography variant="body1" sx={{ opacity: 0.92 }}>
-          Envie uma solicitação e coopere com a comunidade. O brechó avalia e coloca sua
-          peça à venda na plataforma.
-        </Typography>
-      </Box>
-      <Button
-        variant="contained"
-        size="large"
-        onClick={() => setOpen(true)}
+      {/* Padrão botânico translúcido idêntico ao do Hero Banner, integrado com blend mode */}
+      <Box
+        aria-hidden
         sx={{
-          bgcolor: "secondary.contrastText",
-          color: "secondary.main",
-          "&:hover": { bgcolor: "rgba(255,255,255,0.88)" },
+          position: "absolute",
+          inset: 0,
+          backgroundImage: "url('/pattern-sustentavel.png')",
+          backgroundSize: { xs: "135% auto", sm: "110% auto", md: "85% auto" },
+          backgroundPosition: { xs: "right -15px top -10px", md: "right top" },
+          backgroundRepeat: "no-repeat",
+          opacity: 0.16,
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+          zIndex: 1,
         }}
-      >
-        Quero desapegar
-      </Button>
+      />
+
+      {/* Conteúdo principal alinhado acima da camada 3D */}
+      <Box sx={{ position: "relative", zIndex: 2, display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: { md: "center" }, gap: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            p: 1.5,
+            borderRadius: 3,
+            bgcolor: "rgba(0, 0, 0, 0.22)",
+            backdropFilter: "blur(6px)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+            width: "fit-content",
+          }}
+        >
+          <VolunteerActivismIcon sx={{ fontSize: 36, color: "#ffccbc" }} aria-hidden />
+        </Box>
+
+        <Box sx={{ flex: 1 }}>
+          <Typography
+            id="desapego-cta-title"
+            variant="h5"
+            component="h3"
+            sx={{
+              fontWeight: 800,
+              fontSize: { xs: "1.35rem", sm: "1.6rem" },
+              lineHeight: 1.2,
+              mb: 1,
+              textShadow: "0 2px 4px rgba(0,0,0,0.3)",
+            }}
+          >
+            Tem peças paradas no armário?
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "rgba(255, 255, 255, 0.92)",
+              lineHeight: 1.5,
+              fontSize: { xs: "0.85rem", sm: "0.95rem" },
+              maxWidth: "520px",
+            }}
+          >
+            Envie uma solicitação e coopere com a comunidade. O brechó avalia e coloca sua peça à venda na plataforma.
+          </Typography>
+        </Box>
+
+        <Button
+          variant="contained"
+          size="large"
+          onClick={() => setOpen(true)}
+          sx={{
+            bgcolor: "#ffffff",
+            color: "#94461e",
+            fontWeight: 800,
+            borderRadius: 99,
+            px: 3.5,
+            py: 1.2,
+            boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
+            border: "1px solid rgba(255, 255, 255, 0.6)",
+            transition: "transform 150ms ease, background-color 150ms ease",
+            "&:hover": {
+              bgcolor: "#fdfbf7",
+              transform: "translateY(-2px)",
+              boxShadow: "0 12px 26px rgba(0,0,0,0.3)",
+            },
+          }}
+        >
+          Quero desapegar
+        </Button>
+      </Box>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Quero desapegar</DialogTitle>
