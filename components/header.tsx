@@ -23,23 +23,18 @@ import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import Tooltip from "@mui/material/Tooltip";
 import { Stack } from "@/components/flex";
-import { CATEGORIES, type Category } from "@/lib/types";
+import type { Category } from "@/lib/types";
 import { useStore, type ViewMode } from "@/lib/store";
 import { supabase } from "@/lib/supabase";
 
 interface HeaderProps {
   search: string;
   onSearch: (value: string) => void;
-  category: Category | "Todas";
-  onCategory: (value: Category | "Todas") => void;
+  category?: Category | "Todas";
+  onCategory?: (value: Category | "Todas") => void;
 }
 
-export function Header({
-  search,
-  onSearch,
-  category,
-  onCategory,
-}: HeaderProps) {
+export function Header({ search, onSearch }: HeaderProps) {
   const { view, setView } = useStore();
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -49,11 +44,11 @@ export function Header({
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const categories: (Category | "Todas")[] = ["Todas", ...CATEGORIES];
-
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         setIsAuthenticated(true);
       } else {
@@ -66,7 +61,10 @@ export function Header({
     checkSession();
   }, [view, setView]);
 
-  const handleViewChange = (_: React.MouseEvent<HTMLElement>, newView: ViewMode | null) => {
+  const handleViewChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newView: ViewMode | null
+  ) => {
     if (!newView || newView === view) return;
 
     if (newView === "vendedor") {
@@ -123,8 +121,15 @@ export function Header({
           borderColor: "divider",
         }}
       >
-        <Toolbar sx={{ flexDirection: "column", alignItems: "stretch", gap: 1.25, py: 1.25 }}>
-          {/* Linha Superior: Logo, Nome, Botões Comprador/Brechó e Logout alinhados */}
+        <Toolbar
+          sx={{
+            flexDirection: "column",
+            alignItems: "stretch",
+            gap: 1.25,
+            py: 1.25,
+          }}
+        >
+          {/* Linha Superior: Logo, Nome, Botões Comprador/Brechó e Logout */}
           <Stack
             direction="row"
             alignItems="center"
@@ -137,21 +142,35 @@ export function Header({
                 component="img"
                 src="/logo-brecho.png"
                 alt="Logo ReVeste"
-                sx={{ width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, objectFit: "contain" }}
+                sx={{
+                  width: { xs: 40, sm: 48 },
+                  height: { xs: 40, sm: 48 },
+                  objectFit: "contain",
+                }}
               />
               <Box>
                 <Typography
                   variant="h6"
                   component="p"
-                  sx={{ lineHeight: 1.1, fontWeight: 800, fontSize: { xs: "1.05rem", sm: "1.2rem" } }}
+                  sx={{
+                    lineHeight: 1.1,
+                    fontWeight: 800,
+                    fontSize: { xs: "1.05rem", sm: "1.2rem" },
+                  }}
                 >
                   ReVeste
                 </Typography>
-               
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: "0.68rem" }}
+                >
+                  Moda circular colaborativa
+                </Typography>
               </Box>
             </Stack>
 
-            {/* Direita: Botões Comprador/Brechó + Logout compactos */}
+            {/* Direita: Botões Comprador/Brechó + Logout */}
             <Stack direction="row" alignItems="center" spacing={0.75}>
               <ToggleButtonGroup
                 value={view}
@@ -164,17 +183,33 @@ export function Header({
                 <ToggleButton
                   value="cliente"
                   aria-label="Visão do cliente"
-                  sx={{ px: { xs: 1, sm: 1.25 }, py: 0.4, fontSize: "0.74rem" }}
+                  sx={{
+                    px: { xs: 1, sm: 1.25 },
+                    py: 0.4,
+                    fontSize: "0.74rem",
+                  }}
                 >
-                  <ShoppingBagIcon fontSize="small" sx={{ mr: 0.3 }} aria-hidden />
+                  <ShoppingBagIcon
+                    fontSize="small"
+                    sx={{ mr: 0.3 }}
+                    aria-hidden
+                  />
                   Comprador
                 </ToggleButton>
                 <ToggleButton
                   value="vendedor"
                   aria-label="Visão do vendedor"
-                  sx={{ px: { xs: 1, sm: 1.25 }, py: 0.4, fontSize: "0.74rem" }}
+                  sx={{
+                    px: { xs: 1, sm: 1.25 },
+                    py: 0.4,
+                    fontSize: "0.74rem",
+                  }}
                 >
-                  <StorefrontIcon fontSize="small" sx={{ mr: 0.3 }} aria-hidden />
+                  <StorefrontIcon
+                    fontSize="small"
+                    sx={{ mr: 0.3 }}
+                    aria-hidden
+                  />
                   Brechó
                 </ToggleButton>
               </ToggleButtonGroup>
@@ -186,7 +221,11 @@ export function Header({
                     color="default"
                     onClick={handleLogout}
                     aria-label="Encerrar sessão do brechó"
-                    sx={{ border: "1px solid", borderColor: "divider", p: 0.5 }}
+                    sx={{
+                      border: "1px solid",
+                      borderColor: "divider",
+                      p: 0.5,
+                    }}
                   >
                     <LogoutIcon fontSize="small" />
                   </IconButton>
@@ -195,7 +234,7 @@ export function Header({
             </Stack>
           </Stack>
 
-          {/* Barra de Busca logo abaixo */}
+          {/* Barra de Busca */}
           <TextField
             size="small"
             value={search}
@@ -222,65 +261,6 @@ export function Header({
             }}
           />
         </Toolbar>
-
-        {/* Abas de categoria minimalistas */}
-        {view === "cliente" && (
-          <Box
-            component="nav"
-            aria-label="Filtro de categorias"
-            sx={{
-              px: { xs: 2, sm: 3 },
-              display: "flex",
-              gap: { xs: 2.5, sm: 3.5 },
-              overflowX: "auto",
-              "&::-webkit-scrollbar": { display: "none" },
-              scrollbarWidth: "none",
-            }}
-          >
-            {categories.map((c) => {
-              const active = category === c;
-              return (
-                <Box
-                  key={c}
-                  component="button"
-                  type="button"
-                  onClick={() => onCategory(c)}
-                  aria-pressed={active}
-                  sx={{
-                    position: "relative",
-                    border: "none",
-                    background: "transparent",
-                    cursor: "pointer",
-                    py: 1,
-                    px: 0.25,
-                    whiteSpace: "nowrap",
-                    fontFamily: "inherit",
-                    fontSize: "0.85rem",
-                    fontWeight: active ? 800 : 500,
-                    color: active ? "text.primary" : "text.secondary",
-                    transition: "color 150ms ease",
-                    "&:hover": { color: "text.primary" },
-                  }}
-                >
-                  {c}
-                  {active && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: 2.5,
-                        borderRadius: 2,
-                        bgcolor: "primary.main",
-                      }}
-                    />
-                  )}
-                </Box>
-              );
-            })}
-          </Box>
-        )}
       </AppBar>
 
       <Dialog
@@ -291,14 +271,20 @@ export function Header({
         aria-labelledby="login-dialog-title"
       >
         <Box component="form" onSubmit={handleLoginSubmit} noValidate>
-          <DialogTitle id="login-dialog-title" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <DialogTitle
+            id="login-dialog-title"
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
             <LockOutlinedIcon color="primary" />
             Acesso Restrito ao Brechó
           </DialogTitle>
 
-          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+          <DialogContent
+            sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
+          >
             <Typography variant="body2" color="text.secondary">
-              Insira as credenciais do brechó para acessar o painel de pedidos e gestão de estoque.
+              Insira as credenciais do brechó para acessar o painel de pedidos e
+              gestão de estoque.
             </Typography>
 
             {loginError && (
@@ -335,7 +321,12 @@ export function Header({
             <Button onClick={() => setIsLoginOpen(false)} color="inherit">
               Cancelar
             </Button>
-            <Button type="submit" variant="contained" color="primary" disabled={loading}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+            >
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </DialogActions>

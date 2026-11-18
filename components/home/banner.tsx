@@ -157,7 +157,7 @@ export function Banner({
                     borderRadius: 3,
                     p: 1,
                     cursor: "pointer",
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                    
                     border: "1px solid rgba(255, 255, 255, 0.5)",
                     transition: "transform 160ms ease, box-shadow 160ms ease",
                     "&:hover": {

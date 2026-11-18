@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography"
 import { useMemo, useState } from "react"
 import { Header } from "@/components/header"
 import { Banner } from "@/components/home/banner"
+import { ShopByCategory } from "@/components/home/shop-by-category"
 import { ProductGrid } from "@/components/home/product-grid"
 import { ProductDetailDialog } from "@/components/product-detail-dialog"
 import { SellerDashboard } from "@/components/admin/seller-dashboard"
@@ -87,7 +88,7 @@ export default function Page() {
       >
         {view === "cliente" ? (
           <>
-            {/* Aba Vitrine (Hero Editorial + Catálogo) */}
+            {/* Aba Vitrine (Hero Editorial + ShopByCategory + Catálogo) */}
             <Box
               sx={{
                 display: { xs: clientTab === "vitrine" ? "block" : "none", md: "block" },
@@ -95,7 +96,15 @@ export default function Page() {
             >
               <Banner products={products} onOpen={openProduct} />
 
-              <Box component="section" aria-labelledby="catalog-title" sx={{ mb: { xs: 2, md: 5 } }}>
+              <ShopByCategory
+                selectedCategory={category}
+                onSelectCategory={(cat) => {
+                  setCategory(cat)
+                  setClientTab("vitrine")
+                }}
+              />
+
+              <Box component="section" aria-labelledby="catalog-title" sx={{ mt: { xs: 3, md: 5 }, mb: { xs: 2, md: 5 } }}>
                 <Stack
                   direction="row"
                   justifyContent="space-between"
