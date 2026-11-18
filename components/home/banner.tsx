@@ -11,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { Stack } from "@/components/flex";
 import type { Product } from "@/lib/types";
+import { asset } from "@/lib/asset";
 
 const brl = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -69,7 +70,7 @@ export function Banner({
           sx={{
             position: "absolute",
             inset: 0,
-            backgroundImage: "url('/pattern-sustentavel.png')",
+            backgroundImage: `url('${asset("/pattern-sustentavel.png")}')`,
             backgroundSize: {
               xs: "135% auto",
               sm: "110% auto",

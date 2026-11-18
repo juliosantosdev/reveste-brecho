@@ -14,6 +14,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { Stack } from "@/components/flex";
 import { supabase } from "@/lib/supabase";
+import { asset } from "@/lib/asset";
 
 interface WelcomeScreenProps {
   onEnterClient: () => void;
@@ -121,7 +122,7 @@ export function WelcomeScreen({
         sx={{
           position: "absolute",
           inset: -2,
-          backgroundImage: "url('/pattern-sustentavel.png')",
+          backgroundImage: `url('${asset("/pattern-sustentavel.png")}')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -152,7 +153,7 @@ export function WelcomeScreen({
         <Stack alignItems="center" spacing={1} sx={{ textAlign: "center", mb: 3.5 }}>
           <Box
             component="img"
-            src="/logo-brecho.png"
+            src={asset("/logo-brecho.png")}
             alt="Logo ReVeste"
             sx={{ width: 68, height: 68, objectFit: "contain", mb: 0.5 }}
           />

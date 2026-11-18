@@ -15,6 +15,7 @@ import Typography from "@mui/material/Typography"
 import { useState } from "react"
 import { useStore } from "@/lib/store"
 import { CATEGORIES, type Category } from "@/lib/types"
+import { asset } from "@/lib/asset"
 
 interface FormState {
   memberName: string
@@ -87,7 +88,7 @@ export function DesapegoCta() {
         sx={{
           position: "absolute",
           inset: 0,
-          backgroundImage: "url('/pattern-sustentavel.png')",
+          backgroundImage: `url('${asset("/pattern-sustentavel.png")}')`,
           backgroundSize: { xs: "135% auto", sm: "110% auto", md: "85% auto" },
           backgroundPosition: { xs: "right -15px top -10px", md: "right top" },
           backgroundRepeat: "no-repeat",

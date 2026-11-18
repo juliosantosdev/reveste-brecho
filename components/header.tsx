@@ -15,6 +15,7 @@ import { Stack } from "@/components/flex";
 import type { Category } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/lib/supabase";
+import { asset } from "@/lib/asset";
 
 interface HeaderProps {
   search: string;
@@ -94,7 +95,7 @@ export function Header({
           >
             <Box
               component="img"
-              src="/logo-brecho.png"
+              src={asset("/logo-brecho.png")}
               alt="Logo ReVeste"
               sx={{
                 width: { xs: 40, sm: 48 },
