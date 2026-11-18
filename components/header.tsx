@@ -160,13 +160,6 @@ export function Header({ search, onSearch }: HeaderProps) {
                 >
                   ReVeste
                 </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ fontSize: "0.68rem" }}
-                >
-                  Moda circular colaborativa
-                </Typography>
               </Box>
             </Stack>
 
