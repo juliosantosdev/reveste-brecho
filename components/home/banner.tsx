@@ -1,41 +1,45 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
-import ChevronRightIcon from "@mui/icons-material/ChevronRight"
-import RecyclingIcon from "@mui/icons-material/Recycling"
-import Box from "@mui/material/Box"
-import Card from "@mui/material/Card"
-import Chip from "@mui/material/Chip"
-import IconButton from "@mui/material/IconButton"
-import Typography from "@mui/material/Typography"
-import { Stack } from "@/components/flex"
-import type { Product } from "@/lib/types"
+import { useRef } from "react";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import RecyclingIcon from "@mui/icons-material/Recycling";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import { Stack } from "@/components/flex";
+import type { Product } from "@/lib/types";
 
 const brl = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export function Banner({
   products = [],
   onOpen,
 }: {
-  products?: Product[]
-  onOpen?: (p: Product) => void
+  products?: Product[];
+  onOpen?: (p: Product) => void;
 }) {
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const featured = products
     .filter((p) => p.status !== "Concluído/Vendido")
-    .slice(0, 6)
+    .slice(0, 6);
 
   const handleScroll = (direction: "left" | "right") => {
-    if (!scrollRef.current) return
-    const offset = direction === "left" ? -220 : 220
-    scrollRef.current.scrollBy({ left: offset, behavior: "smooth" })
-  }
+    if (!scrollRef.current) return;
+    const offset = direction === "left" ? -220 : 220;
+    scrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
+  };
 
   return (
-    <Box component="section" aria-labelledby="banner-title" sx={{ mb: { xs: 3, md: 4 } }}>
+    <Box
+      component="section"
+      aria-labelledby="banner-title"
+      sx={{ mb: { xs: 3, md: 4 } }}
+    >
       {/* Card com Cavidade Profunda (Inset 3D) + Glassmorphism Externo Intenso */}
       <Box
         sx={{
@@ -66,8 +70,15 @@ export function Banner({
             position: "absolute",
             inset: 0,
             backgroundImage: "url('/pattern-sustentavel.png')",
-            backgroundSize: { xs: "135% auto", sm: "110% auto", md: "85% auto" },
-            backgroundPosition: { xs: "right -15px top -10px", md: "right top" },
+            backgroundSize: {
+              xs: "135% auto",
+              sm: "110% auto",
+              md: "85% auto",
+            },
+            backgroundPosition: {
+              xs: "right -15px top -10px",
+              md: "right top",
+            },
             backgroundRepeat: "no-repeat",
             opacity: 0.18,
             mixBlendMode: "screen",
@@ -88,7 +99,11 @@ export function Banner({
             <Box>
               <Chip
                 size="small"
-                icon={<RecyclingIcon sx={{ fontSize: 14, color: "#a5d6a7 !important" }} />}
+                icon={
+                  <RecyclingIcon
+                    sx={{ fontSize: 14, color: "#a5d6a7 !important" }}
+                  />
+                }
                 label="Curadoria Circular"
                 sx={{
                   bgcolor: "rgba(0, 0, 0, 0.3)",
@@ -120,10 +135,10 @@ export function Banner({
             <Typography
               variant="body2"
               sx={{
-                color: "rgba(255,255,255,0.88)",
-                maxWidth: 340,
-                fontSize: { xs: "0.8rem", sm: "0.875rem" },
-                lineHeight: 1.4,
+                color: "rgba(255, 255, 255, 0.85)",
+                maxWidth: { xs: "100%", md: "none" },
+                whiteSpace: { xs: "normal", md: "nowrap" },
+                fontSize: { xs: "0.85rem", md: "0.95rem" },
               }}
             >
               Peças únicas selecionadas com impacto ambiental reduzido.
@@ -157,7 +172,7 @@ export function Banner({
                     borderRadius: 3,
                     p: 1,
                     cursor: "pointer",
-                    
+
                     border: "1px solid rgba(255, 255, 255, 0.5)",
                     transition: "transform 160ms ease, box-shadow 160ms ease",
                     "&:hover": {
@@ -205,7 +220,11 @@ export function Banner({
                     {item.name}
                   </Typography>
 
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography
                       variant="caption"
                       sx={{
@@ -233,7 +252,12 @@ export function Banner({
 
       {/* Controles circulares sutis abaixo do card */}
       {featured.length > 2 && (
-        <Stack direction="row" justifyContent="center" spacing={1} sx={{ mt: 1.25 }}>
+        <Stack
+          direction="row"
+          justifyContent="center"
+          spacing={1}
+          sx={{ mt: 1.25 }}
+        >
           <IconButton
             size="small"
             onClick={() => handleScroll("left")}
@@ -267,5 +291,5 @@ export function Banner({
         </Stack>
       )}
     </Box>
-  )
+  );
 }

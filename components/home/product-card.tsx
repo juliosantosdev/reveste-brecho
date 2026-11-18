@@ -131,6 +131,7 @@ export function ProductCard({
             position: "relative",
             borderRadius: 3,
             overflow: "hidden",
+            bgcolor: "#dfd5c5",
             cursor: !isSortable && sold ? "default" : "pointer",
             aspectRatio: "4 / 5",
             transition: isDragging
@@ -203,7 +204,9 @@ export function ProductCard({
             sx={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              p: { xs: 1.5, sm: 2 },
+              pt: { xs: 4.5, sm: 5 },
+              objectFit: "contain",
               display: "block",
               transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
               transform: isMobileExpanded ? "scale(1.04)" : "scale(1)",
@@ -359,7 +362,7 @@ export function ProductCard({
               component="img"
               src={previewImage}
               alt="Preview da peça"
-              sx={{ width: 100, height: 100, objectFit: "cover", borderRadius: 2, boxShadow: 1 }}
+              sx={{ width: 100, height: 100, objectFit: "contain", bgcolor: "#dfd5c5", borderRadius: 2, boxShadow: 1 }}
             />
             <Button variant="outlined" component="label" size="small">
               Trocar Foto

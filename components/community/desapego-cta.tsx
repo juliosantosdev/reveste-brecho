@@ -69,11 +69,9 @@ export function DesapegoCta() {
         position: "relative",
         borderRadius: 4,
         overflow: "hidden",
-        // Gradiente terracota acolhedor exclusivo desta seção
         background: "linear-gradient(145deg, #a75225 0%, #bd5e2b 55%, #94461e 100%)",
         color: "#ffffff",
         p: { xs: 3, md: 4 },
-        // Cavidade 3D (inset) + Glassmorphism externo translúcido com brilho nas bordas
         boxShadow: `
           inset 0 12px 28px rgba(60, 20, 8, 0.75),
           inset 0 -8px 16px rgba(130, 65, 30, 0.5),
@@ -84,7 +82,6 @@ export function DesapegoCta() {
         `,
       }}
     >
-      {/* Padrão botânico translúcido idêntico ao do Hero Banner, integrado com blend mode */}
       <Box
         aria-hidden
         sx={{
@@ -101,7 +98,6 @@ export function DesapegoCta() {
         }}
       />
 
-      {/* Conteúdo principal alinhado acima da camada 3D */}
       <Box sx={{ position: "relative", zIndex: 2, display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: { md: "center" }, gap: 3 }}>
         <Box
           sx={{
