@@ -359,14 +359,3 @@ export function WelcomeScreen({
     </Box>
   );
 }
-```[cite: 25]
-
-### Próximos passos
-
-* Teste localmente com `pnpm run build` para confirmar que a verificação de tipos passa sem erros[cite: 24, 25].
-* Faça *commit* e *push* para a *branch* `main`[cite: 23, 25]:
-
-```bash
-git add components/welcome-screen.tsx
-git commit -m "fix(types): ajusta props component e fontWeight no Typography do WelcomeScreen"
-git push origin main
